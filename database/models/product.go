@@ -2,12 +2,10 @@ package models
 
 import (
 	"time"
-
-	"github.com/google/uuid"
 )
 
 type Product struct {
-	Id               uuid.UUID
+	Id               int
 	Name             string
 	Description      string
 	Price            float64

@@ -28,13 +28,13 @@ func (t *Product) getTable() string {
 }
 
 func (t *Product) Upsert(ctx *context.Context, m ...*models.Product) error {
-	return ctx.DB.Debug().WithContext(ctx.Request.Context()).Table(t.getTable()).Save(m).Error
+	return ctx.DB.Primary.Debug().WithContext(ctx.Request.Context()).Table(t.getTable()).Save(m).Error
 }
 
 func (t *Product) Get(ctx *context.Context, id string) (*models.Product, error) {
 	var result models.Product
 
-	err := ctx.DB.Debug().WithContext(ctx.Request.Context()).Table(t.getTable()).First(&result, "id = ?", id).Error
+	err := ctx.DB.Replica.Debug().WithContext(ctx.Request.Context()).Table(t.getTable()).First(&result, "id = ?", id).Error
 	if err != nil {
 		log.Println("unable to product details", zap.Error(err))
 		return nil, err
@@ -46,7 +46,7 @@ func (t *Product) Get(ctx *context.Context, id string) (*models.Product, error) 
 func (t *Product) GetFor(ctx *context.Context, ids []string, name string) ([]*models.Product, error) {
 	var result []*models.Product
 
-	tx := ctx.DB.Debug().WithContext(ctx.Request.Context()).Table(t.getTable())
+	tx := ctx.DB.Replica.Debug().WithContext(ctx.Request.Context()).Table(t.getTable())
 
 	if name != "" {
 		tx.Where("name ilike ?", "%"+name+"%")
@@ -67,7 +67,7 @@ func (t *Product) GetFor(ctx *context.Context, ids []string, name string) ([]*mo
 func (t *Product) GetAll(ctx *context.Context) ([]*models.Product, error) {
 	var result []*models.Product
 
-	err := ctx.DB.Debug().WithContext(ctx.Request.Context()).Table(t.getTable()).Find(&result).Error
+	err := ctx.DB.Replica.Debug().WithContext(ctx.Request.Context()).Table(t.getTable()).Find(&result).Error
 	if err != nil {
 		log.Println("unable to fetch the products", zap.Error(err))
 		return nil, err
@@ -79,7 +79,7 @@ func (t *Product) GetAll(ctx *context.Context) ([]*models.Product, error) {
 func (t *Product) Delete(ctx *context.Context, id string) error {
 	var result models.Product
 
-	err := ctx.DB.WithContext(ctx.Request.Context()).Table(t.getTable()).Delete(&result, "id = ?", id).Error
+	err := ctx.DB.Primary.WithContext(ctx.Request.Context()).Table(t.getTable()).Delete(&result, "id = ?", id).Error
 	if err != nil {
 		log.Println("unable to delete product", zap.Error(err))
 		return err

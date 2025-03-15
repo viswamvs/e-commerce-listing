@@ -3,57 +3,60 @@ package db
 import (
 	"e-commerce-listing/database/models"
 	"log"
-	"os"
 
-	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
-var DB *gorm.DB
-var err error
+var primaryDB *gorm.DB
+var replicaDB *gorm.DB
 
 type DBConn struct {
-	*gorm.DB
+	Primary *gorm.DB
+	Replica *gorm.DB
 }
 
 func New() *DBConn {
 	return &DBConn{
-		DB: DB,
+		Primary: primaryDB,
+		Replica: replicaDB,
 	}
 }
 
 func InitializeDB() {
-	err := godotenv.Load()
+
+	primaryConnectionString := "host=host user=postgres password=password dbname=postgres port=5432 sslmode=disable"
+	replicaConnectionString := "host=host user=postgres password=password dbname=postgres port=5432 sslmode=disable"
+
+	primaryDBInstance, err := gorm.Open(postgres.Open(primaryConnectionString), &gorm.Config{})
 	if err != nil {
-		log.Println("Error loading .env file")
-	}
-
-	host := os.Getenv("DB_HOST")
-	user := os.Getenv("DB_USER")
-	password := os.Getenv("DB_PASSWORD")
-	dbname := os.Getenv("DB_NAME")
-	port := os.Getenv("DB_PORT")
-	sslmode := os.Getenv("DB_SSLMODE")
-
-	connectionString := "host=" + host + " user=" + user + " password=" + password + " dbname=" + dbname + " port=" + port + " sslmode=" + sslmode
-
-	dbInstance, err := gorm.Open(postgres.Open(connectionString), &gorm.Config{})
-	if err != nil {
-		log.Println("Unable to connect to database:", err)
+		log.Println("Unable to connect to primary database:", err)
 		return
 	}
 
-	DB = dbInstance
-	log.Println("Database connected successfully!")
+	primaryDB = primaryDBInstance
+
+	log.Println("primary database connected successfully!")
+
+	replicaDBInstance, err := gorm.Open(postgres.Open(replicaConnectionString), &gorm.Config{})
+	if err != nil {
+		log.Println("Unable to connect to replica database:", err)
+		return
+	}
+
+	replicaDB = replicaDBInstance
+
+	log.Println("replica database connected successfully!")
 
 	AutoMigrateTables()
 }
 
 func AutoMigrateTables() {
-	if DB == nil {
+
+	if primaryDB == nil {
 		log.Println("Database connection is nil, skipping migration")
 		return
 	}
-	DB.AutoMigrate(&models.Product{})
+
+	primaryDB.AutoMigrate(&models.Product{})
 }

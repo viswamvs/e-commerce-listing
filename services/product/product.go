@@ -8,7 +8,6 @@ import (
 	"log"
 	"time"
 
-	"github.com/google/uuid"
 	"go.uber.org/zap"
 )
 
@@ -96,7 +95,7 @@ func (t *ProductService) DeleteProduct(ctx *context.Context) error {
 
 func convertModelToDto(p *models.Product) *dtos.Product {
 	return &dtos.Product{
-		Id:               p.Id.String(),
+		Id:               p.Id,
 		Name:             p.Name,
 		Description:      p.Description,
 		Price:            p.Price,
@@ -112,10 +111,9 @@ func convertModelToDto(p *models.Product) *dtos.Product {
 }
 
 func convertDtoToModel(p *dtos.Product) *models.Product {
-	id, _ := uuid.Parse(p.Id)
 
 	return &models.Product{
-		Id:               id,
+		Id:               p.Id,
 		Name:             p.Name,
 		Description:      p.Description,
 		Price:            p.Price,
