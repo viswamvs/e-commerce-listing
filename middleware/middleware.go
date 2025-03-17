@@ -5,12 +5,14 @@ import (
 	"e-commerce-listing/utils/db"
 
 	"github.com/gin-gonic/gin"
+	"github.com/redis/go-redis/v9"
 )
 
-func AuthMiddleware(next func(*context.Context)) gin.HandlerFunc {
+func AuthMiddleware(next func(*context.Context), redisClient *redis.Client) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx := &context.Context{
 			Context: c,
+			Redis:   redisClient,
 		}
 
 		logAndGetContext(ctx)

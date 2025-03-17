@@ -5,7 +5,7 @@ import (
 )
 
 type Product struct {
-	Id               int
+	Id               int `gorm:"primaryKey;autoIncrement"`
 	Name             string
 	Description      string
 	Price            float64

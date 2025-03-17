@@ -11,6 +11,7 @@ import (
 	"go.uber.org/zap"
 )
 
+
 type IProductService interface {
 	GetProduct(ctx *context.Context, id string) (*dtos.Product, error)
 	GetProducts(ctx *context.Context) (*dtos.Products, error)
@@ -27,6 +28,8 @@ func NewProductService() IProductService {
 		db: product.NewProduct(),
 	}
 }
+
+
 
 func (t *ProductService) GetProduct(ctx *context.Context, id string) (*dtos.Product, error) {
 
