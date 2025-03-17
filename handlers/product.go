@@ -81,14 +81,15 @@ func SaveProduct(c *context.Context) {
 		return
 	}
 
-	cacheKey := fmt.Sprintf("product:%d", req.Id)
+	if req.Id > 0 {
+		cacheKey := fmt.Sprintf("product:%d", req.Id)
 
-	productJSON, err := json.Marshal(req)
-	if err == nil {
-		c.Redis.Set(c.Request.Context(), cacheKey, productJSON, 10*time.Minute)
+		productJSON, err := json.Marshal(req)
+		if err == nil {
+			c.Redis.Set(c.Request.Context(), cacheKey, productJSON, 10*time.Minute)
+		}
+		c.Redis.Del(c.Request.Context(), "products")
 	}
-
-	c.Redis.Del(c.Request.Context(), "products")
 
 	c.JSON(http.StatusOK, gin.H{"message": "success"})
 }
