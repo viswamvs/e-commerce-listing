@@ -124,7 +124,7 @@ Your API will be available at:
 ## **📝 TODO**
 - ✅ Implement **CRUD APIs**
 - ✅ Add **Redis caching**
-- ✅ Use **middleware for authentication**
+- ⏳ Use **middleware for authentication**
 - ⏳ Implement **search & filtering**
 - ⏳ Add **unit tests & integration tests**
 
